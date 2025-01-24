@@ -1,0 +1,135 @@
+:root {
+    --background-color: #ffffff; /* Light mode background */
+    --text-color: #000000; /* Light mode text color */
+    --link-background: linear-gradient(135deg, #007bff, #0056b3); /* Button background */
+    --link-hover-background: linear-gradient(135deg, #0056b3, #004494); /* Button hover background */
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #212529; /* Dark mode background */
+        --text-color: #ffffff; /* Dark mode text color */
+        --link-background: linear-gradient(135deg, #007bff, #0056b3); /* Button background */
+        --link-hover-background: linear-gradient(135deg, #0056b3, #004494); /* Button hover background */
+    }
+}
+
+body {
+    font-family: 'Roboto', sans-serif; /* Font */
+    margin: 0;
+    padding: 0; /* Remove default padding */
+    background-color: var(--background-color); /* Background color */
+    color: var(--text-color); /* Text color */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+header {
+    background-color: hwb(211 6% 31%); /* Header background color */
+    padding: 15px; /* Padding for the header */
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Center items vertically */
+}
+
+.home-button {
+    color: white; /* Button text color */
+    text-decoration: none; /* Remove underline */
+    font-size: 20px; /* Font size */
+    padding: 10px 20px; /* Padding for the button */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s; /* Smooth transition */
+    margin-right: auto; /* Push the button to the left */
+    background: linear-gradient(135deg, #007bff, #0056b3); /* Button background */
+}
+
+.home-button:hover {
+    background-color: #003166; /* Darker background on hover */
+}
+
+h1 {
+    text-align: center; /* Center the title */
+    color: #007bff; /* Title color */
+    margin: 20px 0; /* Adjusted margin */
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: var(--background-color); /* Background color */
+    border-radius: 15px; /* More rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    transition: background 0.3s; /* Smooth transition */
+}
+
+.calculator-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.button-group {
+    display: flex; /* Use flexbox for button grouping */
+    justify-content: space-between; /* Space between buttons */
+    width: 100%; /* Full width for button group */
+    margin: 10px 0; /* Margin between button groups */
+}
+
+.calculator-link {
+    padding: 10px 15px; /* Reduced padding for smaller buttons */
+    background: var(--link-background); /* Button background */
+    color: white; /* Button text color */
+    text-decoration: none; /* Remove underline */
+    border-radius: 5px; /* Rounded corners */
+    transition: background 0.3s, transform 0.2s; /* Smooth transition */
+    flex: 1; /* Allow buttons to grow equally */
+    text-align: center; /* Center text */
+    font-size: 16px; /* Font size */
+    margin: 0 5px; /* Margin between buttons */
+}
+
+.calculator-link:hover {
+    background: var(--link-hover-background); /* Darker gradient on hover */
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+.calculator-link:active {
+    transform: translateY(0); /* Reset lift effect on click */
+}
+
+/* Sliding Menu Styles */
+.menu-container {
+    position: relative; /* Position relative for absolute positioning of the menu */
+}
+
+.sliding-menu {
+    position: fixed; /* Fixed position for the menu */
+    top: 0; /* Align to the top */
+    left: -250px; /* Start off-screen */
+    width: 250px; /* Width of the sliding menu */
+    height: 100%; /* Full height */
+    background-color: #333; /* Background color */
+    color: white; /* Text color */
+    transition: left 0.3s ease; /* Smooth transition for sliding */
+    padding: 20px; /* Padding inside the menu */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5); /* Shadow for the sliding menu */
+    z-index: 999; /* Ensure the menu is above other content */
+}
+
+.menu-button {
+    font-size: 30px; /* Size of the hamburger icon */
+    background: none; /* No background */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin-bottom: 20px; /* Space below the button */
+    color: white; /* Button text color */
+}
+
+.sliding-menu.hidden {
+    left: -250px; /* Hide the menu off-screen */
+}
+
+.sliding-menu.visible {
+    left: 0; /* Show the menu on-screen */
+}
+
+/* Other existing styles remain unchanged */

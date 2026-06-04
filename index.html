@@ -1,43 +1,545 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>calc moyenne</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="home.css"> <!-- Link to the CSS file -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculatrice des Moyennes — Faculté de Technologie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       TOKENS
+    ═══════════════════════════════════════════════════════ */
+    :root {
+      --void:    #08080b;
+      --void-2:  #111116;
+      --void-3:  #1c1c24;
+      --void-4:  #28283a;
+      --ash:     #f2f0eb;
+      --ash-2:   #e4e1d8;
+      --ash-3:   #c8c4b7;
+
+      --gold:    #c8a84b;
+      --gold-2:  #e2c97a;
+      --gold-3:  rgba(200,168,75,.12);
+      --gold-4:  rgba(200,168,75,.06);
+
+      --teal:    #3a8c7e;
+      --teal-2:  rgba(58,140,126,.15);
+
+      --fs:      'Cormorant Garamond', Georgia, serif;
+      --fu:      'Instrument Sans', system-ui, sans-serif;
+      --fm:      'DM Mono', monospace;
+
+      --ease:    cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       RESET
+    ═══════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+    /* ═══════════════════════════════════════════════════════
+       BODY & BACKGROUND
+    ═══════════════════════════════════════════════════════ */
+    body {
+      font-family: var(--fu);
+      background: var(--void);
+      color: var(--ash);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient light orbs */
+    body::before {
+      content: '';
+      position: fixed; top: -20vh; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 500px;
+      background: radial-gradient(ellipse at 50% 50%,
+        rgba(200,168,75,.08) 0%,
+        rgba(58,140,126,.04) 45%,
+        transparent 70%
+      );
+      pointer-events: none; z-index: 0;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; bottom: -10vh; right: -10vw;
+      width: 600px; height: 600px;
+      background: radial-gradient(ellipse,
+        rgba(58,140,126,.06) 0%,
+        transparent 65%
+      );
+      pointer-events: none; z-index: 0;
+    }
+
+    /* Noise texture overlay */
+    .noise {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      opacity: .035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    @keyframes drift {
+      from { transform: translateX(-50%) translateY(0) scale(1); }
+      to   { transform: translateX(-50%) translateY(30px) scale(1.08); }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       LAYOUT WRAPPER
+    ═══════════════════════════════════════════════════════ */
+    .wrapper {
+      position: relative; z-index: 2;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       HEADER
+    ═══════════════════════════════════════════════════════ */
+    .site-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      animation: fadeDown .6s var(--ease) both;
+    }
+
+    .site-logo {
+      font-family: var(--fm);
+      font-size: .72rem; font-weight: 300;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--ash-3);
+    }
+
+    .site-logo span {
+      color: var(--gold);
+      font-weight: 400;
+    }
+
+    .header-badge {
+      display: flex; align-items: center; gap: 7px;
+      font-family: var(--fu); font-size: .7rem; font-weight: 500;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--ash-3);
+      padding: 6px 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 99px;
+    }
+
+    .header-badge::before {
+      content: '';
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 8px var(--teal);
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse { 0%,100% { opacity:.5; } 50% { opacity:1; } }
+
+    /* ═══════════════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════════════ */
+    .hero {
+      padding: 72px 0 56px;
+      animation: fadeUp .8s var(--ease) .1s both;
+    }
+
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .hero-eyebrow-line {
+      height: 1px; width: 40px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+    }
+
+    .hero-eyebrow-text {
+      font-family: var(--fu); font-size: .7rem; font-weight: 600;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .hero-title {
+      font-family: var(--fs);
+      font-weight: 300;
+      font-size: clamp(2.6rem, 7vw, 4.4rem);
+      line-height: 1.05;
+      letter-spacing: -.01em;
+      color: var(--ash);
+      margin-bottom: 10px;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      background: linear-gradient(135deg, var(--gold), var(--gold-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-family: var(--fs);
+      font-style: italic;
+      font-size: 1.25rem;
+      color: var(--ash-3);
+      letter-spacing: .01em;
+      margin-top: 14px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       SECTION LABEL
+    ═══════════════════════════════════════════════════════ */
+    .section-label {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 24px;
+      animation: fadeUp .6s var(--ease) .25s both;
+    }
+
+    .section-label-text {
+      font-family: var(--fu); font-size: .68rem; font-weight: 600;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--ash-3); white-space: nowrap;
+    }
+
+    .section-label-line {
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, rgba(255,255,255,.1), transparent);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       DEPARTMENTS GRID
+    ═══════════════════════════════════════════════════════ */
+    .departments {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .dept-card {
+      position: relative;
+      display: flex; align-items: flex-start;
+      gap: 14px;
+      padding: 20px 22px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 14px;
+      text-decoration: none;
+      color: var(--ash);
+      overflow: hidden;
+      transition: all .28s var(--ease);
+      animation: fadeUp .55s var(--ease) both;
+      cursor: pointer;
+    }
+
+    /* Staggered animation delays */
+    .dept-card:nth-child(1) { animation-delay: .30s; }
+    .dept-card:nth-child(2) { animation-delay: .36s; }
+    .dept-card:nth-child(3) { animation-delay: .42s; }
+    .dept-card:nth-child(4) { animation-delay: .48s; }
+    .dept-card:nth-child(5) { animation-delay: .54s; }
+    .dept-card:nth-child(6) { animation-delay: .60s; }
+    .dept-card:nth-child(7) { animation-delay: .66s; }
+    .dept-card:nth-child(8) { animation-delay: .72s; }
+
+    /* Active card — Génie Civil */
+    .dept-card.active {
+      background: rgba(200,168,75,.08);
+      border-color: rgba(200,168,75,.28);
+    }
+
+    /* Coming-soon cards */
+    .dept-card.soon {
+      opacity: .45;
+      cursor: default;
+    }
+
+    /* Shine sweep on hover */
+    .dept-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(120deg,
+        transparent 30%,
+        rgba(255,255,255,.04) 50%,
+        transparent 70%
+      );
+      transform: translateX(-100%);
+      transition: transform .55s var(--ease);
+    }
+
+    /* Bottom gold accent */
+    .dept-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 20px; right: 20px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0; transition: opacity .28s;
+    }
+
+    .dept-card:not(.soon):hover {
+      background: rgba(255,255,255,.045);
+      border-color: rgba(200,168,75,.22);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 48px rgba(0,0,0,.4), 0 0 0 1px rgba(200,168,75,.1);
+    }
+
+    .dept-card:not(.soon):hover::before { transform: translateX(100%); }
+    .dept-card:not(.soon):hover::after  { opacity: 1; }
+    .dept-card:not(.soon):active        { transform: translateY(0); }
+
+    .dept-icon {
+      flex-shrink: 0;
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: var(--void-3);
+      border: 1px solid rgba(255,255,255,.07);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      transition: background .28s, border-color .28s;
+    }
+
+    .dept-card.active .dept-icon {
+      background: var(--gold-3);
+      border-color: rgba(200,168,75,.3);
+    }
+
+    .dept-card:not(.soon):hover .dept-icon {
+      background: var(--gold-3);
+      border-color: rgba(200,168,75,.25);
+    }
+
+    .dept-body { flex: 1; min-width: 0; }
+
+    .dept-name {
+      font-family: var(--fs);
+      font-size: 1.05rem; font-weight: 400;
+      line-height: 1.25;
+      color: var(--ash);
+      margin-bottom: 6px;
+      transition: color .2s;
+    }
+
+    .dept-card:not(.soon):hover .dept-name { color: var(--gold-2); }
+    .dept-card.active .dept-name           { color: var(--gold-2); }
+
+    .dept-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--fu); font-size: .63rem; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase;
+    }
+
+    .dept-tag.tag-active {
+      color: var(--gold);
+    }
+
+    .dept-tag.tag-soon {
+      color: var(--ash-3);
+    }
+
+    .dept-tag::before {
+      content: '';
+      width: 5px; height: 5px; border-radius: 50%;
+    }
+
+    .dept-tag.tag-active::before { background: var(--gold); box-shadow: 0 0 5px var(--gold); }
+    .dept-tag.tag-soon::before   { background: var(--ash-3); }
+
+    /* Arrow for active cards */
+    .dept-arrow {
+      flex-shrink: 0;
+      align-self: center;
+      color: var(--ash-3);
+      font-size: .8rem;
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity .2s, transform .2s var(--ease);
+    }
+
+    .dept-card:not(.soon):hover .dept-arrow {
+      opacity: 1; transform: translateX(0);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════ */
+    .site-footer {
+      padding: 32px 0;
+      border-top: 1px solid rgba(255,255,255,.06);
+      display: flex; align-items: center; justify-content: space-between;
+      animation: fadeUp .6s var(--ease) .8s both;
+    }
+
+    .footer-copy {
+      font-family: var(--fm);
+      font-size: .7rem; font-weight: 300;
+      letter-spacing: .1em;
+      color: var(--ash-3);
+    }
+
+    .footer-copy span { color: var(--gold); }
+
+    .footer-mono {
+      font-family: var(--fm);
+      font-size: .65rem; color: var(--void-4);
+      letter-spacing: .08em;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       KEYFRAMES
+    ═══════════════════════════════════════════════════════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════ */
+    @media (max-width: 560px) {
+      .wrapper { padding: 0 16px; }
+      .hero { padding: 48px 0 40px; }
+      .departments { grid-template-columns: 1fr; gap: 10px; }
+      .hero-title { font-size: 2.4rem; }
+      .site-footer { flex-direction: column; gap: 10px; text-align: center; }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       SELECTION & SCROLLBAR
+    ═══════════════════════════════════════════════════════ */
+    ::selection { background: rgba(200,168,75,.2); color: var(--ash); }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--void); }
+    ::-webkit-scrollbar-thumb { background: var(--void-4); border-radius: 99px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>calculatrice des moyenne</h1>
-        <div class="calculator-links">
-            <h4 align="center">Faculté de Technologie</h4>
-            <div class="button-group">
-                <a class="calculator-link" href="https://skrull9557.github.io/GC/">Département de Génie Civil</a>
-            </div>
-            <div class="button-group">
-                <a class="calculator-link" href="#">département de Technologie</a>
-            </div>
-            <div class="button-group">
-                <a class="calculator-link" href="#">département d'Hydraulique</a>
-            </div> <div class="button-group">
-                <a class="calculator-link" href="#">département de Génie Mécanique</a>
-            </div> <div class="button-group">
-                <a class="calculator-link" href="#">département de Génie Électrique</a>
-            </div> <div class="button-group">
-                <a class="calculator-link" href="#">département d'Automatique, Télécommunications et d'Électronique</a>
-            </div> <div class="button-group">
-                <a class="calculator-link" href="#">département de Génie des Procédés</a>
-            </div> <div class="button-group">
-                <a class="calculator-link" href="#">département  d'Architecture</a>
-            </div>
-            </div> <div class="button-group">
-            <a class="calculator-link" href="#">des Mines et Géologie</a>
-             </div>
+
+<div class="noise"></div>
+
+<div class="wrapper">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="site-logo">Calc<span>·</span>Moyenne</div>
+    <div class="header-badge">Faculté de Technologie</div>
+  </header>
+
+  <!-- Hero -->
+  <main>
+    <div class="hero">
+      <div class="hero-eyebrow">
+        <div class="hero-eyebrow-line"></div>
+        <span class="hero-eyebrow-text">Université</span>
+      </div>
+      <h1 class="hero-title">
+        Calculatrice<br>des <em>Moyennes</em>
+      </h1>
+      <p class="hero-subtitle">Sélectionnez votre département</p>
     </div>
-            
-    <footer align="center">
-        <p>&copy; 2024 Skrull. All rights reserved.</p>
-    </footer>
+
+    <!-- Section label -->
+    <div class="section-label">
+      <span class="section-label-text">Départements</span>
+      <div class="section-label-line"></div>
+      <span class="section-label-text" style="color:var(--void-4);">8</span>
+    </div>
+
+    <!-- Department cards -->
+    <div class="departments">
+
+      <!-- Active -->
+      <a class="dept-card active" href="https://skrull9557.github.io/GC/">
+        <div class="dept-icon">🏗️</div>
+        <div class="dept-body">
+          <div class="dept-name">Génie Civil</div>
+          <span class="dept-tag tag-active">Disponible</span>
+        </div>
+        <span class="dept-arrow">→</span>
+      </a>
+
+      <!-- Coming soon -->
+      <div class="dept-card soon">
+        <div class="dept-icon">⚙️</div>
+        <div class="dept-body">
+          <div class="dept-name">Technologie</div>
+          <span class="dept-tag tag-soon">Bientôt</span>
+        </div>
+      </div>
+
+      <div class="dept-card soon">
+        <div class="dept-icon">💧</div>
+        <div class="dept-body">
+          <div class="dept-name">Hydraulique</div>
+          <span class="dept-tag tag-soon">Bientôt</span>
+        </div>
+      </div>
+
+      <div class="dept-card soon">
+        <div class="dept-icon">🔩</div>
+        <div class="dept-body">
+          <div class="dept-name">Génie Mécanique</div>
+          <span class="dept-tag tag-soon">Bientôt</span>
+        </div>
+      </div>
+
+      <div class="dept-card soon">
+        <div class="dept-icon">⚡</div>
+        <div class="dept-body">
+          <div class="dept-name">Génie Électrique</div>
+          <span class="dept-tag tag-soon">Bientôt</span>
+        </div>
+      </div>
+
+      <div class="dept-card soon">
+        <div class="dept-icon">📡</div>
+        <div class="dept-body">
+          <div class="dept-name">Automatique, Télécommunications & Électronique</div>
+          <span class="dept-tag tag-soon">Bientôt</span>
+        </div>
+      </div>
+
+      <div class="dept-card soon">
+        <div class="dept-icon">🧪</div>
+        <div class="dept-body">
+          <div class="dept-name">Génie des Procédés</div>
+          <span class="dept-tag tag-soon">Bientôt</span>
+        </div>
+      </div>
+
+      <div class="dept-card soon">
+        <div class="dept-icon">🏛️</div>
+        <div class="dept-body">
+          <div class="dept-name">Architecture</div>
+          <span class="dept-tag tag-soon">Bientôt</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-copy">&copy; 2024 <span>Skrull</span> · Tous droits réservés</div>
+    <div class="footer-mono">v2.0</div>
+  </footer>
+
+</div>
+
 </body>
 </html>
